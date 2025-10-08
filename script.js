@@ -222,6 +222,98 @@ function typeWriter(element, text, speed = 100) {
     type();
 }
 
+// Chatbot configuration
+const chatbotConfig = {
+    welcomeMessage: "Hello! I'm your assistant. How can I help you today?",
+    responses: {
+        'hello': 'Hi there! How can I assist you?',
+        'hi': 'Hello! What can I do for you?',
+        'help': 'I can answer questions about this website, portfolio, services, and contact information.',
+        'services': 'Here are the services I offer: Web Development, Design, Consulting. What specifically interests you?',
+        'contact': 'You can reach me via email: your-email@example.com or through the contact form on this site.',
+        'portfolio': 'Check out my work in the portfolio section. Would you like to know about specific projects?',
+        'price': 'Pricing depends on the project scope. Please contact me for a detailed quote.',
+        'default': "I'm not sure I understand. Could you please rephrase your question? You can ask about services, portfolio, contact, or help."
+    }
+};
+
+// Initialize chatbot
+function initChatbot() {
+    const toggleBtn = document.getElementById('chatbot-toggle');
+    const container = document.getElementById('chatbot-container');
+    const closeBtn = document.getElementById('chatbot-close');
+    const sendBtn = document.getElementById('chatbot-send');
+    const textInput = document.getElementById('chatbot-text');
+    const messagesContainer = document.getElementById('chatbot-messages');
+
+    // Show welcome message
+    addBotMessage(chatbotConfig.welcomeMessage);
+
+    // Toggle chatbot
+    toggleBtn.addEventListener('click', () => {
+        container.classList.toggle('active');
+    });
+
+    // Close chatbot
+    closeBtn.addEventListener('click', () => {
+        container.classList.remove('active');
+    });
+
+    // Send message
+    function sendMessage() {
+        const message = textInput.value.trim();
+        if (message) {
+            addUserMessage(message);
+            textInput.value = '';
+            setTimeout(() => generateResponse(message), 1000);
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    
+    textInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Add message functions
+    function addMessage(text, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+        messageDiv.textContent = text;
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+        addMessage(text, true);
+    }
+
+    function addBotMessage(text) {
+        addMessage(text, false);
+    }
+
+    // Generate response
+    function generateResponse(userMessage) {
+        const lowerMessage = userMessage.toLowerCase();
+        let response = chatbotConfig.responses.default;
+
+        // Check for matching responses
+        for (const [key, value] of Object.entries(chatbotConfig.responses)) {
+            if (lowerMessage.includes(key) && key !== 'default') {
+                response = value;
+                break;
+            }
+        }
+
+        addBotMessage(response);
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', initChatbot);
+
 // Uncomment to enable typing effect
 // window.addEventListener('load', () => {
 //     const heroTitle = document.querySelector('.hero-title');
